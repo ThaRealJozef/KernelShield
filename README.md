@@ -1,4 +1,4 @@
-# KernelShield 🛡️
+# KernelShield
 
 **KernelShield** is an experimental eBPF-based firewall I'm building to learn more about the Linux kernel's networking subsystems. 
 
