@@ -1,0 +1,19 @@
+# Binaries
+kernelshield
+*.o
+*.test
+
+# BPF generated files
+cmd/kernelshield/bpf_bpfel.go
+cmd/kernelshield/bpf_bpfeb.go
+cmd/kernelshield/bpf_bpfel.o
+cmd/kernelshield/bpf_bpfeb.o
+
+# Go
+vendor/
+go.sum
+
+# IDE
+.vscode/
+.idea/
+docs/

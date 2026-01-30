@@ -1,0 +1,6 @@
+2026/01/30 17:30:30 Blocked IP: 127.0.0.1
+2026/01/30 17:30:30 Attached XDP Firewall to lo
+2026/01/30 17:30:30 Press Ctrl-C to exit and remove the program
+2026/01/30 17:30:32 Traffic Stats - Allowed: 0 | Dropped: 2
+2026/01/30 17:30:34 Traffic Stats - Allowed: 0 | Dropped: 3
+2026/01/30 17:30:35 Detaching...
