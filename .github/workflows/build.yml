@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.24'
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang llvm libbpf-dev bpftool gcc-multilib
+
+    - name: Verify Code Quality
+      run: |
+        go vet ./...
+        go fmt ./...
+    
+    # Attempting full build (may fail if specific kernel headers missing, but standard ones exist in runner)
+    - name: Build
+      run: make all

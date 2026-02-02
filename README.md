@@ -1,6 +1,10 @@
 # KernelShield
 
-KernelShield is an experimental eBPF security engine built to explore Linux kernel internals. It combines high-performance network filtering (XDP) with system integrity monitoring (Kprobes/Tracepoints) into a unified Go-controlled framework.
+![License](https://img.shields.io/badge/License-Dual%20BSD%2FGPL-blue.svg)
+![Go](https://img.shields.io/github/go-mod/go-version/ThaRealJozef/KernelShield)
+[![Build](https://github.com/ThaRealJozef/KernelShield/actions/workflows/build.yml/badge.svg)](https://github.com/ThaRealJozef/KernelShield/actions/workflows/build.yml)
+
+**KernelShield** is an experimental eBPF security engine built to explore Linux kernel internals. It combines high-performance network filtering (XDP) with system integrity monitoring (Kprobes/Tracepoints) into a unified Go-controlled framework.
 
 ## Architecture
 
