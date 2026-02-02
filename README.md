@@ -14,6 +14,7 @@ The project implements a "split-brain" design:
 
 *   **XDP Firewall**: Drops unauthorized IPv4 traffic at the NIC driver level, before the stack processes it.
 *   **Syscall Sentry**: Monitors `sys_openat` and `sys_openat2` to detect access to sensitive files (e.g., `/etc/shadow`) in real-time.
+*   **LSM Enforcer**: Uses BPF LSM hooks (`lsm/file_open`) to actively block access to protected files (requires `CONFIG_BPF_LSM`).
 *   **CO-RE Enabled**: Uses `vmlinux.h` for Compile-Once Run-Everywhere support across different kernel versions.
 
 ## Prerequisites
@@ -39,7 +40,10 @@ Once running, you can verify the system monitor by accessing a sensitive file in
 `cat /etc/shadow`
 
 The controller will alert:
-`[ALERT] 🚨 SENSITIVE FILE ACCESS: Process 'cat' (PID 1234) opened /etc/shadow`
+`[ALERT] 🚨 SENSITIVE ACCESS: Process 'cat' (PID 1234) -> /etc/shadow`
+
+If the LSM Enforcer is active (kernel boot param `lsm=...,bpf`), the operation will be blocked entirely:
+`cat: /etc/shadow: Permission denied`
 
 ## License
 Dual BSD/GPL
