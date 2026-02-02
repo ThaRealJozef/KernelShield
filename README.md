@@ -1,46 +1,45 @@
 # KernelShield
 
-**KernelShield** is an experimental eBPF-based firewall I'm building to learn more about the Linux kernel's networking subsystems. 
+KernelShield is an experimental eBPF security engine built to explore Linux kernel internals. It combines high-performance network filtering (XDP) with system integrity monitoring (Kprobes/Tracepoints) into a unified Go-controlled framework.
 
-The goal was to move security logic out of user space (which is slow) and strictly into the kernel using **XDP (eXpress Data Path)**. This allows the program to drop malicious packets at the driver level—before the OS even expends resources allocating memory for them.
+## Architecture
 
-## Technical Architecture
+The project implements a "split-brain" design:
+*   **Kernel Enforcer (C)**: BPF programs running in-kernel for line-rate performance.
+    *   `xdp_firewall.c`: Network-layer filtering.
+    *   `sys_monitor.c`: Syscall auditing via Ring Buffers.
+*   **User Controller (Go)**: A daemon managing the BPF lifecycle, map updates, and event streaming using `cilium/ebpf`.
 
-The project follows a split-brain architecture:
+## Features
 
-1.  **Kernel Space (C)**: An XDP program (`xdp_firewall.c`) that hooks into the network interface. It parses Ethernet and IP headers to make split-second Drop/Pass decisions.
-2.  **User Space (Go)**: A controller daemon that uses `cilium/ebpf` to manage the kernel program. It handles the lifecycle, loads BPF maps, and populates the blocklist.
+*   **XDP Firewall**: Drops unauthorized IPv4 traffic at the NIC driver level, before the stack processes it.
+*   **Syscall Sentry**: Monitors `sys_openat` and `sys_openat2` to detect access to sensitive files (e.g., `/etc/shadow`) in real-time.
+*   **CO-RE Enabled**: Uses `vmlinux.h` for Compile-Once Run-Everywhere support across different kernel versions.
 
-## Current Features
+## Prerequisites
 
-- ⚡ **Line-Rate Filtering**: Packets are processed directly in the network driver path.
-- 🚫 **Dynamic Blocklisting**: The Go controller can push IP addresses to a BPF Hash Map to instantly drop traffic without reloading the program.
-- 📊 **Telemetry**: Real-time packet counters (Allowed vs Dropped) tracking flow stats from the kernel.
+*   **Platform**: Linux with BTF enabled (tested on WSL2 Ubuntu).
+*   **Kernel**: 5.4+ (5.8+ recommended for Ring Buffer support).
+*   **Tools**: `clang`, `llvm`, `make`, `bpftool`, `go 1.22+`.
 
-## Getting Started
+## Build & Usage
 
-I built this on WSL2, but it should run on any modern Linux kernel (5.4+) with BTF support.
-
-### Prerequisites
-- Clang/LLVM 10+
-- Go 1.20+
-- `bpftool`
-
-### Build & Run
 ```bash
-# Install dependencies (Ubuntu/Debian)
-sudo apt install clang llvm libbpf-dev bpftool make golang-go
+# 1. Install dependencies
+sudo apt update && sudo apt install clang llvm libbpf-dev bpftool make golang-go
 
-# Compile C BPF and Go binaries
+# 2. Build kernel and user space components
 make all
 
-# Run the controller (requires root to load BPF)
+# 3. Running (Requires root to load BPF)
 sudo ./kernelshield
 ```
 
-## Future Roadmap
+Once running, you can verify the system monitor by accessing a sensitive file in another terminal:
+`cat /etc/shadow`
 
-I'm checking out **Kprobes** next—the plan is to monitor system calls (like `sys_openat`) to detect when specific files (like `/etc/shadow`) are accessed by unauthorized processes.
+The controller will alert:
+`[ALERT] 🚨 SENSITIVE FILE ACCESS: Process 'cat' (PID 1234) opened /etc/shadow`
 
 ## License
 Dual BSD/GPL

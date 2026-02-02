@@ -34,18 +34,13 @@ int xdp_firewall(struct xdp_md *ctx) {
 		return XDP_PASS;
 	}
 
-	// 2. Check if it's an IP packet
-	if (eth->h_proto != bpf_htons(ETH_P_IP)) {
-		return XDP_PASS;
-	}
-
-	// 3. Parse IP Header
+	// IPv4 Packet Parsing
 	struct iphdr *ip = (void *)(eth + 1);
 	if ((void *)(ip + 1) > data_end) {
 		return XDP_PASS;
 	}
 
-	// 4. Lookup Source IP in Blocked Map
+	// Lookup source IP in the blocklist map
 	__u32 src_ip = ip->saddr;
 	__u8 *blocked = bpf_map_lookup_elem(&blocked_ips, &src_ip);
 
@@ -53,15 +48,13 @@ int xdp_firewall(struct xdp_md *ctx) {
 	__u64 *value;
 
 	if (blocked) {
-		// DROP
-		key = 1;
+		key = 1; // Dropped index
 		value = bpf_map_lookup_elem(&pkt_count, &key);
 		if (value) __sync_fetch_and_add(value, 1);
 		return XDP_DROP;
 	}
 
-	// ALLOW
-	key = 0;
+	key = 0; // Allowed index
 	value = bpf_map_lookup_elem(&pkt_count, &key);
 	if (value) __sync_fetch_and_add(value, 1);
 
