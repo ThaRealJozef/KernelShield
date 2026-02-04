@@ -27,7 +27,6 @@ flowchart LR
 
 ## Demo
 
-<!-- Replace with your asciinema-agg generated GIF -->
 ![KernelShield Demo](docs/img/demo.gif)
 
 ## Features
