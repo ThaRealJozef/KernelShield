@@ -27,7 +27,7 @@ flowchart LR
 
 ## Demo
 
-![KernelShield Demo](docs/img/demo.gif)
+![KernelShield Demo](assets/demo.gif)
 
 ## Features
 
